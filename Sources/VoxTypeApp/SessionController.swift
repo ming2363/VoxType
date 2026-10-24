@@ -34,6 +34,8 @@ final class SessionController {
     private var observer: NSObjectProtocol?
     private var logID: String?
     private var acceptSessionID = ""
+    private var focusProbeID: UUID?
+    private var focusProbeItem: DispatchWorkItem?
 
     private enum Fallback {
         case none
@@ -64,6 +66,12 @@ final class SessionController {
     }
 
     func hotkeyUp() {
+        if focusProbeID != nil {
+            cancelFocusProbe()
+            gate.finished()
+            publish("空闲", "已取消启动")
+            return
+        }
         let action = gate.keyUp()
         if action == .beginFinish || action == .cancelStartAndFinish {
             beginFinish()
@@ -101,6 +109,7 @@ final class SessionController {
     }
 
     private func begin() {
+        model.overlayText = ""
         guard let hotkey = model.hotkey, hotkey.isConfigured else {
             abortStart("未设置", "请先在设置中录制快捷键")
             return
@@ -122,14 +131,45 @@ final class SessionController {
             abortStart("无输入监控", "需要输入监控权限后才能接收快捷键松开")
             return
         }
-        switch inserter.probe() {
+        guard let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier, pid != getpid() else {
+            abortStart("无法输入", "请先点击目标应用中的输入框")
+            return
+        }
+        let id = UUID()
+        focusProbeID = id
+        probeFocus(pid: pid, id: id, attempt: 0)
+    }
+
+    private func probeFocus(pid: pid_t, id: UUID, attempt: Int) {
+        guard focusProbeID == id, gate.phase == .starting, gate.keyHeld else { return }
+        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == pid else {
+            abortStart("无法输入", "焦点应用已切换，已取消启动")
+            return
+        }
+        switch inserter.probe(targetPID: pid) {
+        case .focusUnavailable(let reason):
+            guard attempt < 3 else {
+                abortStart("无法输入", reason)
+                return
+            }
+            if attempt == 0 {
+                FocusedElementReader.enableElectronAccessibility(for: pid)
+            }
+            let work = DispatchWorkItem { [weak self] in
+                self?.probeFocus(pid: pid, id: id, attempt: attempt + 1)
+            }
+            focusProbeItem = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
         case .blocked(let reason):
             abortStart("无法输入", reason)
         case .live(let element, let pid):
+            cancelFocusProbe()
             startSession(element: element, pid: pid, route: .liveReplace, fallback: .none)
         case .sentence(let element, let pid):
+            cancelFocusProbe()
             startSession(element: element, pid: pid, route: .sentenceInsert, fallback: .none)
         case .unicode(let element, let pid):
+            cancelFocusProbe()
             startSession(element: element, pid: pid, route: .releaseInsert, fallback: .unicode)
         }
     }
@@ -249,6 +289,12 @@ final class SessionController {
     }
 
     private func beginFinish() {
+        if focusProbeID != nil {
+            cancelFocusProbe()
+            gate.finished()
+            publish("空闲", "已取消启动")
+            return
+        }
         guard gate.phase == .finishing, !cleanupDone else { return }
         audio?.stopCapture()
         if !writeFailed {
@@ -545,6 +591,7 @@ final class SessionController {
     }
 
     private func abortStart(_ short: String, _ detail: String) {
+        cancelFocusProbe()
         audio?.discard()
         audio = nil
         asr?.close()
@@ -586,9 +633,16 @@ final class SessionController {
     }
 
     private func releaseResources() {
+        cancelFocusProbe()
         releaseASRResources()
         cancelLocalDelivery()
         element = nil
+    }
+
+    private func cancelFocusProbe() {
+        focusProbeID = nil
+        focusProbeItem?.cancel()
+        focusProbeItem = nil
     }
 
     private func publish(_ short: String, _ detail: String) {

@@ -35,8 +35,8 @@ final class AppModel: ObservableObject {
     private let defaults = UserDefaults.standard
     private var lastResult = ""
 
-    init() {
-        load()
+    init(loadPreferences: Bool = true) {
+        if loadPreferences { load() }
     }
 
     var uid: String {
@@ -234,6 +234,9 @@ final class AppModel: ObservableObject {
     func updateSessionPhase(_ phase: SessionPhase) {
         guard sessionPhase != phase else { return }
         sessionPhase = phase
+        // Showing the panel before the startup focus probe can disturb the target's AX focus.
+        // startSession publishes its first status after binding the input field.
+        guard phase != .starting else { return }
         onStatusChanged?()
     }
 

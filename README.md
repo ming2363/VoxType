@@ -3,26 +3,18 @@
 </p>
 <h1 align="center">VoxType</h1>
 <p align="center">
-  <strong>Open-source dictation. Zero client subscription. Zero model downloads. Your clipboard stays yours.</strong>
+  <strong>Lightweight, open-source dictation for Mac.</strong>
 </p>
-<p align="center">Hold a shortcut. Speak Chinese, English, or both. Text goes directly into the field you're using.</p>
-<p align="center"><sub>The client is free; bring your Doubao ASR key. Provider usage charges apply.</sub></p>
+<p align="center">Chinese and English, straight to your cursor. No client subscription.</p>
 <p align="center">
   <img src="https://img.shields.io/badge/macOS-15%2B-111827" alt="macOS 15+">
-  <img src="https://img.shields.io/badge/Apple_Silicon-arm64-007AFF" alt="Apple Silicon">
-  <img src="https://img.shields.io/badge/Swift-native-F05138" alt="Native Swift">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-2563EB" alt="Apache 2.0"></a>
 </p>
 <p align="center">
-  English · <a href="README.zh-CN.md">简体中文</a><br>
-  <a href="#why-voxtype">Why VoxType</a> · <a href="#how-it-compares">Comparison</a> · <a href="#measured-not-guessed">Measurements</a> · <a href="docs/GETTING_STARTED.md">Get started</a>
+  English · <a href="README.zh-CN.md">简体中文</a>
 </p>
 
-![VoxType advantages: Apache-2.0 source, no client subscription, no bundled local models, and no automatic clipboard writes.](docs/images/advantages-en.svg)
-
 ## Why VoxType
-
-**VoxType is for Mac users who want an inspectable, focused dictation tool without a client subscription or a local model setup.** Its native Swift client sends speech to Doubao Streaming ASR 2.0 under your own account and writes into the focused field. You control the source and service account; there is no VoxType account or relay server.
 
 - **Direct input, preserved clipboard.** Accessibility writes or Unicode keyboard events deliver your words. Only an explicit Copy Last Result action changes the clipboard.
 - **Streaming text with sentence-final correction.** Supported fields show live text; finalized ASR results correct the current sentence. Other fields use automatic sentence-final or release-time delivery.
@@ -48,6 +40,8 @@ The measured baseline app contained **2.21 MiB** of file contents, including its
 ## A short path to speaking
 
 You need **an Apple Silicon Mac running macOS 15+**, a network connection, and your own enabled **Volcengine Doubao Streaming ASR 2.0** account/key.
+
+The client is free and needs no VoxType account. Bring your own Doubao ASR key; provider usage charges apply.
 
 1. Build/install the native app using [the build guide](docs/BUILDING.md).
 2. Open Settings from the menu bar; save your API key and choose a shortcut.

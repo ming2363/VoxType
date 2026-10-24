@@ -1,6 +1,6 @@
 # README graphics: sources and reproduction
 
-The English and Chinese READMEs embed three locally versioned SVGs each: the advantage summary, product-approach comparison and measured ASR chart. PNG copies are provided for sharing. The graphics have no external images, scripts or fonts to download and are not bundled in the macOS app.
+The English and Chinese READMEs embed two locally versioned SVGs each: the product-approach comparison and measured ASR chart. The advantage-summary cards remain available as separate assets, outside the README opening. PNG copies are provided for sharing. The graphics have no external images, scripts or fonts to download and are not bundled in the macOS app.
 
 ## Evidence
 

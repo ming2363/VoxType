@@ -14,6 +14,7 @@ enum InputProbe {
     case live(AXUIElement, pid_t)
     case sentence(AXUIElement, pid_t)
     case unicode(AXUIElement, pid_t)
+    case focusUnavailable(String)
     case blocked(String)
 }
 
@@ -28,10 +29,12 @@ final class TextInserter {
     private var guardState = InsertionGuard()
     private let marker = AppModel.syntheticMarker
     private var delivery: PendingDelivery?
+    private let focusReader = FocusedElementReader()
 
-    func probe() -> InputProbe {
+    func probe(targetPID: pid_t? = nil) -> InputProbe {
         guard AXIsProcessTrusted() else { return .blocked("需要辅助功能权限") }
-        guard let element = systemFocus() else { return .blocked("当前没有可编辑输入框") }
+        let focus = focusReader.resolve(expectedPID: targetPID)
+        guard let element = focus.element else { return .focusUnavailable(focus.failureMessage) }
         let role = stringAttribute(element, kAXRoleAttribute) ?? ""
         let subrole = stringAttribute(element, kAXSubroleAttribute) ?? ""
         if role == "AXSecureTextField" || subrole == "AXSecureTextField" || role.contains("Secure") {
@@ -467,11 +470,7 @@ final class TextInserter {
     }
 
     private func systemFocus() -> AXUIElement? {
-        let system = AXUIElementCreateSystemWide()
-        var value: CFTypeRef?
-        let error = AXUIElementCopyAttributeValue(system, kAXFocusedUIElementAttribute as CFString, &value)
-        guard error == .success, let value else { return nil }
-        return (value as! AXUIElement)
+        focusReader.resolve().element
     }
 
     private func parameterizedAvailable(_ element: AXUIElement) -> Bool {

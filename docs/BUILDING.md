@@ -35,3 +35,7 @@ The optional [ASR benchmark](../benchmarks/README.md) is separate from ordinary 
 `python3 Tests/check_clipboard_boundary.py` checks the source boundary that allows clipboard access only in the explicit Copy Last Result menu action. It does not inspect or modify your actual clipboard. Run it alongside the core assertions when changing text delivery.
 
 `Tests/RunFloatingStatusChecks/main.swift` is an AppKit display regression using a fake model and the real `FloatingStatusController`. Compile those two files with the same SDK/module flags and linked VoxTypeCore/CGZip objects as the app. It briefly displays test indicators in an interactive Mac session, checks persistence beyond the 2.4-second timeout, stale dismissals, finishing, and nonactivating behavior. It never accesses the microphone, ASR, Keychain, clipboard or real input fields.
+
+`Tests/RunFocusChecks/main.swift` compiles with `Sources/VoxTypeApp/FocusedElementReader.swift` using the same SDK flags (no VoxTypeCore object needed). It injects AX replies to check system-to-application fallback, error reporting, malformed responses and application-switch guards, without reading another app's UI.
+
+`Tests/RunStartupChecks/main.swift` compiles with `Sources/VoxTypeApp/AppModel.swift` and VoxTypeCore/CGZip. It runs the real gate-to-model notification bridge with preference loading disabled, verifying that target binding precedes the first startup display notification while recording/finishing notifications remain immediate. It does not access user credentials or another application's UI.

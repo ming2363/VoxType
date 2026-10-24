@@ -1,0 +1,5 @@
+module CGZip {
+    header "CGZip.h"
+    link "z"
+    export *
+}

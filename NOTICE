@@ -1,0 +1,13 @@
+VoxType
+Copyright 2026 VoxType contributors
+
+This project's original source code and documentation are licensed under the
+Apache License, Version 2.0. See LICENSE.
+
+The application icon was created with AI image generation for this project;
+its design and generation prompts are documented in Resources/Branding/README.md.
+
+Apple frameworks and system zlib are external system components.
+Volcengine/Doubao services and other product names remain subject to their
+respective terms and rights. This project's license does not grant access to
+third-party services. See docs/THIRD_PARTY.md.

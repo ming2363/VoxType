@@ -1,0 +1,32 @@
+# Generated builds, SDK copies and local installation artifacts
+.build/
+dist/
+.swiftpm/
+.DS_Store
+*.log
+*.dSYM/
+
+# Credentials and signing material must stay on each user's Mac
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keychain
+*.keychain-db
+signing.pass
+
+# Private development history, account screenshots/notes and copied vendor docs
+.local/
+AI_*PROMPT.md
+IMPLEMENTATION_PLAN.md
+docs/VERIFICATION.md
+references/
+
+# Generated speech is reproducible; publish hashes and measurements instead
+benchmarks/audio/
+benchmarks/local/
+__pycache__/
+*.pyc

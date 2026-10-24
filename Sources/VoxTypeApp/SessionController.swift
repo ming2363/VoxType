@@ -153,7 +153,7 @@ final class SessionController {
                 return
             }
             if attempt == 0 {
-                FocusedElementReader.enableElectronAccessibility(for: pid)
+                inserter.prepareAccessibility(for: pid)
             }
             let work = DispatchWorkItem { [weak self] in
                 self?.probeFocus(pid: pid, id: id, attempt: attempt + 1)

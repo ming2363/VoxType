@@ -31,6 +31,10 @@ final class TextInserter {
     private var delivery: PendingDelivery?
     private let focusReader = FocusedElementReader()
 
+    func prepareAccessibility(for pid: pid_t) {
+        focusReader.prepareAccessibility(for: pid)
+    }
+
     func probe(targetPID: pid_t? = nil) -> InputProbe {
         guard AXIsProcessTrusted() else { return .blocked("需要辅助功能权限") }
         let focus = focusReader.resolve(expectedPID: targetPID)

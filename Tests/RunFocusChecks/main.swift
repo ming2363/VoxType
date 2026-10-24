@@ -75,4 +75,24 @@ let noApp = FocusedElementReader(frontmostPID: { nil }, read: { _ in
     fatalError("不应查询没有目标的输入框")
 })
 check(noApp.resolve().element == nil, "没有前台应用时安全退出")
+
+var roleRequested = false
+var roleRequests = 0
+let chromium = FocusedElementReader(frontmostPID: { pid }, read: { _ in
+    roleRequested ? (.success, field) : (.noValue, nil)
+}, requestApplicationRole: { app in
+    var owner: pid_t = 0
+    AXUIElementGetPid(app, &owner)
+    check(owner == pid, "标准角色请求只发给当前目标应用")
+    roleRequests += 1
+    roleRequested = true
+})
+check(chromium.resolve().element == nil, "复现未请求应用角色时 Chromium 不返回焦点")
+check(roleRequests == 0, "普通焦点查询不反复请求辅助功能初始化")
+chromium.prepareAccessibility(for: pid)
+check(roleRequests == 1, "不依赖 Electron 框架名称也请求标准应用角色")
+check(chromium.resolve(expectedPID: pid).element.map { CFEqual($0, field) } == true,
+      "标准角色请求后可解析当前输入焦点")
+chromium.prepareAccessibility(for: pid + 1)
+check(roleRequests == 1, "不初始化非前台应用的辅助功能")
 print("焦点检查通过：\(checks) 项；无界面输入、录音、网络或剪贴板访问。")

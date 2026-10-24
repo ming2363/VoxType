@@ -22,6 +22,18 @@ struct FocusedElementReader {
         let error = AXUIElementCopyAttributeValue(source, kAXFocusedUIElementAttribute as CFString, &value)
         return (error, value)
     }
+    var requestApplicationRole: (AXUIElement) -> Void = { app in
+        var role: CFTypeRef?
+        // BrowserCrApplication activates native accessibility when its standard role is requested.
+        _ = AXUIElementCopyAttributeValue(app, kAXRoleAttribute as CFString, &role)
+    }
+
+    func prepareAccessibility(for pid: pid_t) {
+        guard frontmostPID() == pid else { return }
+        // Do this before the optional Electron-specific path: Chromium bundles can rename frameworks.
+        requestApplicationRole(AXUIElementCreateApplication(pid))
+        Self.enableElectronAccessibility(for: pid)
+    }
 
     func resolve(expectedPID: pid_t? = nil) -> FocusedElementLookup {
         guard let pid = frontmostPID(), expectedPID == nil || expectedPID == pid else {

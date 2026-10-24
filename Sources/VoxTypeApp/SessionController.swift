@@ -77,7 +77,7 @@ final class SessionController {
             beginFinish()
             return
         }
-        if gate.phase == .idle {
+        if gate.phase == .idle && model.statusShort != "已完成" {
             deliverOverlayIfMissing()
         }
     }
@@ -383,9 +383,8 @@ final class SessionController {
             forcedFinalize: false
         )
         guard case .updated(let snapshot) = result else { return }
-        model.remember(snapshot.displayText)
         model.focusRect = inserter.focusRect()
-        model.updateOverlay(snapshot.displayText)
+        model.updateRecognition(snapshot)
         if !stoppedWriting {
             let allowed = inserter.insertionStillAllowed()
             if !allowed {
@@ -401,9 +400,9 @@ final class SessionController {
 
     private func finish(incomplete: Bool, detail: String) {
         guard !cleanupDone else { return }
+        let snapshot = reducer.snapshot
+        model.updateRecognition(snapshot)
         if !stoppedWriting {
-            let snapshot = reducer.snapshot
-            model.remember(snapshot.displayText)
             let allowed = inserter.insertionStillAllowed()
             if !allowed {
                 invalidateWriting(reason: "光标或焦点已变化，已停止写入")

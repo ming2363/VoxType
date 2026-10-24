@@ -14,6 +14,12 @@
   English · <a href="README.zh-CN.md">简体中文</a>
 </p>
 
+![VoxType measured ASR latency: first text P50 891 ms and P95 1292 ms; final tail P50 471 ms and P95 698 ms. Chinese CER 0.58%, English WER 0%, mixed MER 5.17%; 60 successful requests.](docs/images/benchmark-en.svg)
+
+The 2026-10-24 evaluation used **30 synthetic sentences × 2 repetitions**, with real Doubao calls. Timings cover ASR transport and result reduction, excluding microphone startup and visible field insertion. No competitor was timed in this run. [Raw results and limits](benchmarks/RESULTS.md) · [Reproduce the test](benchmarks/README.md).
+
+The measured baseline app contained **2.21 MiB** of file contents, including its icon and signature, with a **754 KiB** executable. These are snapshot measurements; build sizes can change. `Package.swift` declares **0 remote package dependencies**.
+
 ## Why VoxType
 
 - **Direct input, preserved clipboard.** Accessibility writes or Unicode keyboard events deliver your words. Only an explicit Copy Last Result action changes the clipboard.
@@ -28,14 +34,6 @@ Field compatibility depends on the target application's accessibility support. I
 ![Product approach comparison: VoxType emphasizes editable source, direct BYOK recognition and clipboard-free input; Wispr Flow emphasizes writing polish; Superwhisper emphasizes offline and model options; Apple Dictation is built in.](docs/images/comparison-en.svg)
 
 <sub>Official product capabilities checked 2026-10-24. This is a capability map, not a network-call diagram or measured performance ranking. Both commercial alternatives offer free tiers. [Sources and scope](docs/images/README.md).</sub>
-
-## Measured, not guessed
-
-![VoxType measured ASR latency: first text P50 891 ms and P95 1292 ms; final tail P50 471 ms and P95 698 ms. Chinese CER 0.58%, English WER 0%, mixed MER 5.17%; 60 successful requests.](docs/images/benchmark-en.svg)
-
-The 2026-10-24 evaluation used **30 synthetic sentences × 2 repetitions**, with real Doubao calls. Timings cover ASR transport and result reduction, excluding microphone startup and visible field insertion. No competitor was timed in this run. [Raw results and limits](benchmarks/RESULTS.md) · [Reproduce the test](benchmarks/README.md).
-
-The measured baseline app contained **2.21 MiB** of file contents, including its icon and signature, with a **754 KiB** executable. These are snapshot measurements; build sizes can change. `Package.swift` declares **0 remote package dependencies**.
 
 ## A short path to speaking
 

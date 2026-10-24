@@ -241,12 +241,18 @@ final class AppModel: ObservableObject {
     }
 
     func updateStatus(short: String, detail: String) {
-        statusShort = short
+        // Let the final correction paint before the existing transient indicator dismisses it.
+        statusShort = short == "空闲" && !overlayText.isEmpty ? "已完成" : short
         statusDetail = detail
-        if short == "空闲" || short == "启动" {
+        if short == "启动" {
             overlayText = ""
         }
         onStatusChanged?()
+    }
+
+    func updateRecognition(_ snapshot: RecognitionSnapshot) {
+        remember(snapshot.displayText)
+        updateOverlay(snapshot.displayText)
     }
 
     func updateOverlay(_ text: String) {

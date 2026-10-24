@@ -18,7 +18,7 @@
 - 能安全修改范围时，替换当前未定稿文字，句末用 ASR 定稿纠正；其他情况自动在句末或松开后输入。
 - 手动输入、移动光标或切换焦点可能使本次写入停止，避免修改错误位置。
 - 带修饰键的快捷键可能使模拟输入等待修饰键完全松开。
-- 回退粘贴临时使用剪贴板，只有确认成功且未被其他程序修改时才尝试恢复。「复制上次结果」是用户主动操作，会覆盖剪贴板。
+- 听写直接写入焦点输入框；辅助功能不能直接写入时，使用 Unicode 键盘事件，不读写剪贴板。无法确认输入成功时停止，避免重复插入。「复制上次结果」仍是用户主动操作，会覆盖剪贴板。
 - 不支持密码框。当前版本清理换行为空格，避免通过换行发送消息或执行命令。
 
 ## 登录启动
@@ -29,4 +29,4 @@
 
 Build the app, open Settings from the menu bar, save a valid Doubao Streaming ASR 2.0 key, record a shortcut, and grant Microphone, Accessibility and Input Monitoring permissions. Focus an ordinary field, hold the shortcut, speak, and release. Some settings labels are currently Chinese.
 
-Streaming edits depend on accessibility support; otherwise finalized text is inserted automatically. Changing focus, moving the caret or typing can stop insertion. Clipboard fallback may temporarily replace clipboard content. Login startup is optional; password fields are excluded, and the app never presses Enter to submit text.
+Streaming edits depend on accessibility support; otherwise finalized text is inserted with direct Unicode keyboard events. Changing focus, moving the caret or typing can stop insertion. Automatic dictation never reads or writes the clipboard; only the explicit Copy Last Result action does. If delivery cannot be confirmed, it stops rather than retrying with paste. Login startup is optional; password fields are excluded, and the app never presses Enter to submit text.

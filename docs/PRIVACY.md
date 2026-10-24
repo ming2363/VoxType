@@ -14,7 +14,7 @@ This describes the inspected implementation, not a provider privacy guarantee.
 
 No audio-file archive, transcript-history database or separate analytics integration is implemented. The idle path does not start microphone capture or an ASR session. These are source observations, not a complete network or operating-system audit.
 
-Microphone permission enables capture. Input Monitoring observes the shortcut. Accessibility/event posting supports focused-field inspection and text delivery. Clipboard fallback temporarily exposes the transcript to clipboard managers; an explicit copy action replaces clipboard contents normally. The on-screen status indicator may display recognized words.
+Microphone permission enables capture. Input Monitoring observes the shortcut. Accessibility/event posting supports focused-field inspection and text delivery. Automatic dictation uses direct field writes or Unicode keyboard events and does not read or write the clipboard. Only the explicit Copy Last Result action replaces clipboard contents; clipboard managers may retain that explicitly copied result. The on-screen status indicator may display recognized words.
 
 The app excludes password fields and does not press Enter to submit text. Focus, caret and manual-edit guards reduce unintended changes, but every application and field cannot be guaranteed compatible.
 
@@ -24,4 +24,4 @@ The app excludes password fields and does not press Enter to submit text. Focus,
 
 密钥进入系统钥匙串，听写音频会发给火山引擎／豆包，不是本地离线识别。应用没有录音归档、转写历史数据库或独立统计分析接入；最近结果保留在内存，状态提示可能显示识别文字。
 
-为了安全写入，会读取焦点输入框和选区，当前请求构造器不会把这些文字作为上下文上传。ASR 请求携带随机生成并持久保存的匿名 UUID，不是电脑序列号。粘贴回退和主动复制会使用剪贴板，剪贴板管理工具可能保留这些内容。服务商的数据处理与保留政策需要另行查看。
+为了安全写入，会读取焦点输入框和选区，当前请求构造器不会把这些文字作为上下文上传。ASR 请求携带随机生成并持久保存的匿名 UUID，不是电脑序列号。自动听写不读写剪贴板，只有主动选择「复制上次结果」才会修改它，剪贴板管理工具可能保留主动复制的内容。服务商的数据处理与保留政策需要另行查看。

@@ -241,12 +241,9 @@ final class SupportTests: XCTestCase {
         XCTAssertEqual(InsertedText.sanitized("a\nb\r\nc"), "a b c")
     }
 
-    func testModifierAndClipboardPolicies() {
+    func testModifierDefersSyntheticInput() {
         XCTAssertTrue(SyntheticInputPolicy.mustDefer(held: .command))
         XCTAssertFalse(SyntheticInputPolicy.mustDefer(held: []))
-        XCTAssertFalse(ClipboardRestore.shouldRestore(pasteConfirmed: false, changeCountAfterWrite: 2, currentChangeCount: 2))
-        XCTAssertFalse(ClipboardRestore.shouldRestore(pasteConfirmed: true, changeCountAfterWrite: 2, currentChangeCount: 3))
-        XCTAssertTrue(ClipboardRestore.shouldRestore(pasteConfirmed: true, changeCountAfterWrite: 2, currentChangeCount: 2))
     }
 
     func testHotkeyMatcherIgnoresUnrelatedModifiers() {
@@ -258,6 +255,21 @@ final class SupportTests: XCTestCase {
 }
 
 final class RecheckTests: XCTestCase {
+    func testFloatingStatusFollowsSessionInsteadOfStatusText() {
+        for phase in [SessionPhase.starting, .recording, .finishing] {
+            for status in ["空闲", "已停止", "无权限", "确认输入", "连接提示"] {
+                let display = FloatingStatusDisplay(phase: phase, status: status)
+                XCTAssertNotNil(display.status)
+                XCTAssertFalse(display.autoHides)
+            }
+        }
+        XCTAssertEqual(FloatingStatusDisplay(phase: .recording, status: "已停止"), .persistent("录音"))
+        XCTAssertEqual(FloatingStatusDisplay(phase: .idle, status: "空闲"), .hidden)
+        XCTAssertFalse(FloatingStatusDisplay(phase: .idle, status: "确认输入").autoHides)
+        XCTAssertFalse(FloatingStatusDisplay(phase: .idle, status: "等待松开").autoHides)
+        XCTAssertTrue(FloatingStatusDisplay(phase: .idle, status: "无法输入").autoHides)
+    }
+
     func testSecondSentenceIsNotTreatedAsCursorMove() {
         var guardState = InsertionGuard()
         guardState.noteCommittedInsert(endCursor: UTF16Text.length("第一句。"))
@@ -304,14 +316,6 @@ final class RecheckTests: XCTestCase {
         XCTAssertFalse(callbacks.timeout("first"))
         XCTAssertFalse(callbacks.failed)
         XCTAssertTrue(callbacks.handshake("second"))
-    }
-
-    func testUnicodeChannelResetsEachSession() {
-        var delivery = SessionDeliveryState()
-        for _ in 0..<3 {
-            delivery.reset(fallbackIsUnicode: true)
-            XCTAssertEqual(delivery.nextChannel(), "unicode")
-        }
     }
 
     func testFinishKeepsWriteFailure() {

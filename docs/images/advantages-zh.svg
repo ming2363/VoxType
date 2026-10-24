@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="350" viewBox="0 0 1200 350" role="img" aria-labelledby="title desc">
+<title id="title">把语音输入的控制权交给你</title>
+<desc id="desc">VoxType implementation facts, not competitor scores. ASR usage is billed separately.</desc>
+<style>text{font-family:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif}</style>
+<defs>
+<marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><path d="M0 0L10 3.5L0 7Z" fill="#2563eb"/></marker>
+<marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><path d="M0 0L10 3.5L0 7Z" fill="#94a3b8"/></marker>
+</defs>
+<rect x="1" y="1" width="1198" height="348" rx="28" fill="#ffffff" stroke="#e2e8f0"/>
+<text x="48" y="62" font-size="32" fill="#111827" font-weight="700" text-anchor="start">把语音输入的控制权交给你</text>
+<text x="48" y="99" font-size="20" fill="#64748b" font-weight="400" text-anchor="start">原生 Swift · 自备 ASR Key · 按住说话，松开收尾</text>
+<rect x="48" y="133" width="258" height="156" rx="18" fill="#eff6ff" stroke="#dbeafe"/>
+<text x="68" y="184" font-size="32" fill="#2563eb" font-weight="700" text-anchor="start">Apache 2.0</text>
+<text x="68" y="225" font-size="20" fill="#111827" font-weight="600" text-anchor="start">开源可改</text>
+<text x="68" y="258" font-size="16" fill="#64748b" font-weight="400" text-anchor="start">源码可审查、可修改</text>
+<rect x="330" y="133" width="258" height="156" rx="18" fill="#eff6ff" stroke="#dbeafe"/>
+<text x="350" y="184" font-size="32" fill="#2563eb" font-weight="700" text-anchor="start">$0</text>
+<text x="350" y="225" font-size="20" fill="#111827" font-weight="600" text-anchor="start">客户端订阅费</text>
+<text x="350" y="258" font-size="16" fill="#64748b" font-weight="400" text-anchor="start">ASR 用量另行计费</text>
+<rect x="612" y="133" width="258" height="156" rx="18" fill="#eff6ff" stroke="#dbeafe"/>
+<text x="632" y="184" font-size="32" fill="#2563eb" font-weight="700" text-anchor="start">0</text>
+<text x="632" y="225" font-size="20" fill="#111827" font-weight="600" text-anchor="start">随包本地模型</text>
+<text x="632" y="258" font-size="16" fill="#64748b" font-weight="400" text-anchor="start">云端流式识别</text>
+<rect x="894" y="133" width="258" height="156" rx="18" fill="#eff6ff" stroke="#dbeafe"/>
+<text x="914" y="184" font-size="32" fill="#2563eb" font-weight="700" text-anchor="start">0</text>
+<text x="914" y="225" font-size="20" fill="#111827" font-weight="600" text-anchor="start">听写剪贴板写入</text>
+<text x="914" y="258" font-size="16" fill="#64748b" font-weight="400" text-anchor="start">直接写入焦点输入框</text>
+<text x="48" y="324" font-size="16" fill="#64748b" font-weight="400" text-anchor="start">剪贴板说明：仅主动点击「复制上次结果」会修改剪贴板。</text>
+</svg>

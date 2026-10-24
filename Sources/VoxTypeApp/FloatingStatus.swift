@@ -1,4 +1,5 @@
 import AppKit
+import VoxTypeCore
 
 // 不抢焦点的状态条。文字仍写入当前输入框，这里只提示是否在听。
 final class FloatingStatusController {
@@ -10,6 +11,7 @@ final class FloatingStatusController {
     private let bars = WaveBars()
     private var pulse: Timer?
     private var hideItem: DispatchWorkItem?
+    private var hideGeneration: UInt64 = 0
     private var keepFront: Timer?
     private var visible = false
     private let shadowInset: CGFloat = 18
@@ -47,17 +49,15 @@ final class FloatingStatusController {
     }
 
     func refresh() {
-        let short = model.statusShort
-        if short == "空闲" || short == "已停止" {
-            hideNow(animated: false)
+        cancelHide()
+        let display = FloatingStatusDisplay(phase: model.sessionPhase, status: model.statusShort)
+        guard let short = display.status else {
+            hideNow()
             return
         }
         let pulsing = short == "录音" || short == "启动"
         show(title: Self.title(for: short), subtitle: subtitle(for: short), pulsing: pulsing, tint: Self.tint(for: short))
-        if Self.sticky.contains(short) {
-            hideItem?.cancel()
-            hideItem = nil
-        } else {
+        if display.autoHides {
             scheduleHide()
         }
     }
@@ -90,10 +90,7 @@ final class FloatingStatusController {
     }
 
     private func reveal() {
-        NSAnimationContext.beginGrouping()
-        NSAnimationContext.current.duration = 0
         panel.alphaValue = 1
-        NSAnimationContext.endGrouping()
         panel.orderFrontRegardless()
         visible = true
         startKeepFront()
@@ -170,34 +167,33 @@ final class FloatingStatusController {
     }
 
     private func scheduleHide() {
-        hideItem?.cancel()
+        cancelHide()
+        let generation = hideGeneration
         let work = DispatchWorkItem { [weak self] in
-            self?.hideNow()
+            guard let self, self.hideGeneration == generation,
+                  FloatingStatusDisplay(phase: self.model.sessionPhase, status: self.model.statusShort).autoHides else { return }
+            self.hideNow()
         }
         hideItem = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.4, execute: work)
     }
 
-    private func hideNow(animated: Bool = true) {
+    private func cancelHide() {
+        hideGeneration &+= 1
         hideItem?.cancel()
         hideItem = nil
+    }
+
+    private func hideNow() {
+        cancelHide()
         stopPulse()
         stopKeepFront()
         lineField.setText("")
         guard visible else { return }
         visible = false
-        guard animated else {
-            panel.alphaValue = 0
-            panel.orderOut(nil)
-            return
-        }
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.12
-            panel.animator().alphaValue = 0
-        }, completionHandler: { [weak self] in
-            guard let self, !self.visible else { return }
-            self.panel.orderOut(nil)
-        })
+        // Immediate dismissal prevents an old fade animation from hiding a new session.
+        panel.alphaValue = 0
+        panel.orderOut(nil)
     }
 
     private func startPulse() {
@@ -239,8 +235,6 @@ final class FloatingStatusController {
     private func measure(_ text: String, font: NSFont) -> CGFloat {
         ceil((text as NSString).size(withAttributes: [.font: font]).width)
     }
-
-    private static let sticky: Set<String> = ["启动", "录音", "收尾", "请稍后"]
 
     private static func title(for short: String) -> String {
         switch short {

@@ -15,6 +15,7 @@ final class AppModel: ObservableObject {
 
     @Published var statusShort = "空闲"
     @Published var statusDetail = "等待快捷键"
+    @Published private(set) var sessionPhase: SessionPhase = .idle
     @Published var hasAPIKey = false
     @Published var hotkey: HotkeyChord?
     @Published var recordingHotkey = false
@@ -228,6 +229,12 @@ final class AppModel: ObservableObject {
         @unknown default:
             launchStatusText = "状态未知"
         }
+    }
+
+    func updateSessionPhase(_ phase: SessionPhase) {
+        guard sessionPhase != phase else { return }
+        sessionPhase = phase
+        onStatusChanged?()
     }
 
     func updateStatus(short: String, detail: String) {

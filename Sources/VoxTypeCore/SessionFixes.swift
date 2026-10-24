@@ -326,26 +326,6 @@ public final class SessionCallbackGate {
     }
 }
 
-public struct SessionDeliveryState: Equatable, Sendable {
-    public var unicodeTried = false
-    public var fallbackIsUnicode = false
-
-    public init() {}
-
-    public mutating func reset(fallbackIsUnicode: Bool) {
-        unicodeTried = false
-        self.fallbackIsUnicode = fallbackIsUnicode
-    }
-
-    public mutating func nextChannel() -> String {
-        if fallbackIsUnicode && !unicodeTried {
-            unicodeTried = true
-            return "unicode"
-        }
-        return "paste"
-    }
-}
-
 public enum FinishStatus {
     public static func resolve(
         writeFailed: Bool,

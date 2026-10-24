@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="770" viewBox="0 0 1200 770" role="img" aria-labelledby="title desc">
+<title id="title">Four dictation approaches. Different kinds of control.</title>
+<desc id="desc">Qualitative product capability map based on official sources, checked 2026-10-24. No numeric ratings, latency ranking or inferred network topology.</desc>
+<style>text{font-family:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif}</style>
+<defs>
+<marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><path d="M0 0L10 3.5L0 7Z" fill="#2563eb"/></marker>
+<marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><path d="M0 0L10 3.5L0 7Z" fill="#94a3b8"/></marker>
+</defs>
+<rect x="1" y="1" width="1198" height="768" rx="28" fill="#ffffff" stroke="#e2e8f0"/>
+<text x="48" y="62" font-size="32" fill="#111827" font-weight="700" text-anchor="start">Four dictation approaches. Different kinds of control.</text>
+<text x="48" y="99" font-size="20" fill="#64748b" font-weight="400" text-anchor="start">VoxType: editable source, your ASR account, and a clipboard-free input path.</text>
+<rect x="48" y="135" width="540" height="238" rx="20" fill="#eff6ff" stroke="#93c5fd"/>
+<text x="72" y="177" font-size="28" fill="#2563eb" font-weight="700" text-anchor="start">VoxType</text>
+<text x="72" y="208" font-size="19" fill="#64748b" font-weight="400" text-anchor="start">Native, direct dictation</text>
+<rect x="70" y="238" width="148" height="48" rx="12" fill="#ffffff" stroke="#bfdbfe"/>
+<text x="144" y="268" font-size="17" fill="#2563eb" font-weight="600" text-anchor="middle">Your key</text>
+<line x1="221" y1="262" x2="240" y2="262" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+<rect x="244" y="238" width="148" height="48" rx="12" fill="#ffffff" stroke="#bfdbfe"/>
+<text x="318" y="268" font-size="17" fill="#2563eb" font-weight="600" text-anchor="middle">Streaming ASR</text>
+<line x1="395" y1="262" x2="414" y2="262" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+<rect x="418" y="238" width="148" height="48" rx="12" fill="#ffffff" stroke="#bfdbfe"/>
+<text x="492" y="268" font-size="17" fill="#2563eb" font-weight="600" text-anchor="middle">Text field</text>
+<rect x="70" y="312" width="148" height="34" rx="17" fill="#dbeafe" stroke="none"/>
+<text x="144" y="335" font-size="16" fill="#2563eb" font-weight="600" text-anchor="middle">Open source</text>
+<rect x="244" y="312" width="148" height="34" rx="17" fill="#dbeafe" stroke="none"/>
+<text x="318" y="335" font-size="16" fill="#2563eb" font-weight="600" text-anchor="middle">No client sub</text>
+<rect x="418" y="312" width="148" height="34" rx="17" fill="#dbeafe" stroke="none"/>
+<text x="492" y="335" font-size="16" fill="#2563eb" font-weight="600" text-anchor="middle">No clipboard</text>
+<rect x="612" y="135" width="540" height="238" rx="20" fill="#f8fafc" stroke="#e2e8f0"/>
+<text x="636" y="177" font-size="28" fill="#111827" font-weight="700" text-anchor="start">Wispr Flow</text>
+<text x="636" y="208" font-size="19" fill="#64748b" font-weight="400" text-anchor="start">Writing across platforms</text>
+<rect x="634" y="238" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="708" y="268" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">Speech</text>
+<line x1="785" y1="262" x2="804" y2="262" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-gray)"/>
+<rect x="808" y="238" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="882" y="268" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">Polish / format</text>
+<line x1="959" y1="262" x2="978" y2="262" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-gray)"/>
+<rect x="982" y="238" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="1056" y="268" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">Current app</text>
+<rect x="634" y="312" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="708" y="335" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">100+ languages</text>
+<rect x="808" y="312" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="882" y="335" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">Cross-platform</text>
+<rect x="982" y="312" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="1056" y="335" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">Free / Pro</text>
+<rect x="48" y="401" width="540" height="238" rx="20" fill="#f8fafc" stroke="#e2e8f0"/>
+<text x="72" y="443" font-size="28" fill="#111827" font-weight="700" text-anchor="start">Superwhisper</text>
+<text x="72" y="474" font-size="19" fill="#64748b" font-weight="400" text-anchor="start">Offline and model choice</text>
+<rect x="70" y="504" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="144" y="534" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">Local / cloud</text>
+<line x1="221" y1="528" x2="240" y2="528" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-gray)"/>
+<rect x="244" y="504" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="318" y="534" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">Custom modes</text>
+<line x1="395" y1="528" x2="414" y2="528" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-gray)"/>
+<rect x="418" y="504" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="492" y="534" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">Current app</text>
+<rect x="70" y="578" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="144" y="601" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">Offline option</text>
+<rect x="244" y="578" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="318" y="601" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">BYOK in Pro</text>
+<rect x="418" y="578" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="492" y="601" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">100+ languages</text>
+<rect x="612" y="401" width="540" height="238" rx="20" fill="#f8fafc" stroke="#e2e8f0"/>
+<text x="636" y="443" font-size="28" fill="#111827" font-weight="700" text-anchor="start">Apple Dictation</text>
+<text x="636" y="474" font-size="19" fill="#64748b" font-weight="400" text-anchor="start">Built into macOS</text>
+<rect x="634" y="504" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="708" y="534" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">System shortcut</text>
+<line x1="785" y1="528" x2="804" y2="528" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-gray)"/>
+<rect x="808" y="504" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="882" y="534" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">OS dictation</text>
+<line x1="959" y1="528" x2="978" y2="528" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-gray)"/>
+<rect x="982" y="504" width="148" height="48" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="1056" y="534" font-size="17" fill="#111827" font-weight="600" text-anchor="middle">Text field</text>
+<rect x="634" y="578" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="708" y="601" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">Built in</text>
+<rect x="808" y="578" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="882" y="601" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">No extra app</text>
+<rect x="982" y="578" width="148" height="34" rx="17" fill="#e2e8f0" stroke="none"/>
+<text x="1056" y="601" font-size="16" fill="#111827" font-weight="600" text-anchor="middle">Custom shortcut</text>
+<rect x="48" y="685" width="14" height="14" rx="4" fill="#2563eb" stroke="none"/>
+<text x="72" y="698" font-size="16" fill="#64748b" font-weight="400" text-anchor="start">VoxType</text>
+<rect x="184" y="685" width="14" height="14" rx="4" fill="#94a3b8" stroke="none"/>
+<text x="208" y="698" font-size="16" fill="#64748b" font-weight="400" text-anchor="start">Other approaches</text>
+<text x="48" y="737" font-size="16" fill="#64748b" font-weight="400" text-anchor="start">Checked 2026-10-24. Capability map, not call counts or performance ranks. VoxType requires the network.</text>
+</svg>

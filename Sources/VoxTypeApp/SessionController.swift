@@ -8,7 +8,9 @@ final class SessionController {
     var onStatus: ((String, String) -> Void)?
 
     private let inserter = TextInserter()
-    private var gate = SessionGate()
+    private var gate = SessionGate() {
+        didSet { model.updateSessionPhase(gate.phase) }
+    }
     private var audio: AudioCapture?
     private var asr: DoubaoASRClient?
     private var reducer = RecognitionReducer()
@@ -23,14 +25,12 @@ final class SessionController {
     private var cleanupDone = false
     private var modifiers = ModifierMask()
     private var pendingSynthetic: String?
-    private var deliveryState = SessionDeliveryState()
     private var callbacks = SessionCallbackGate()
     private var writeFailed = false
     private var pumpItem: DispatchWorkItem?
     private var timeoutItem: DispatchWorkItem?
     private var deliveryItem: DispatchWorkItem?
     private var focusRestoreAttempts = 0
-    private var pasteFallbackTried = false
     private var observer: NSObjectProtocol?
     private var logID: String?
     private var acceptSessionID = ""
@@ -38,7 +38,6 @@ final class SessionController {
     private enum Fallback {
         case none
         case unicode
-        case paste
     }
 
     init(model: AppModel) {
@@ -132,8 +131,6 @@ final class SessionController {
             startSession(element: element, pid: pid, route: .sentenceInsert, fallback: .none)
         case .unicode(let element, let pid):
             startSession(element: element, pid: pid, route: .releaseInsert, fallback: .unicode)
-        case .paste(let element, let pid):
-            startSession(element: element, pid: pid, route: .releaseInsert, fallback: .paste)
         }
     }
 
@@ -141,7 +138,6 @@ final class SessionController {
         cleanupDone = false
         stoppedWriting = false
         writeFailed = false
-        pasteFallbackTried = false
         focusRestoreAttempts = 0
         handshakeReady = false
         lastPacketSent = false
@@ -153,7 +149,6 @@ final class SessionController {
         sessionID = UUID().uuidString
         acceptSessionID = sessionID
         callbacks.begin(sessionID)
-        deliveryState.reset(fallbackIsUnicode: fallback == .unicode)
         reducer = RecognitionReducer()
         writer = DictationWriteModel(route: route)
         self.element = element
@@ -461,55 +456,35 @@ final class SessionController {
             return
         }
         pendingSynthetic = nil
-        switch deliveryState.nextChannel() {
-        case "unicode":
-            if inserter.beginUnicode(text) {
-                scheduleDeliveryPoll(fallbackText: text)
-            } else {
-                invalidateWriting(reason: "无法投递文字")
-            }
-        default:
-            if inserter.beginPaste(text) {
-                scheduleDeliveryPoll(fallbackText: nil)
-            } else {
-                invalidateWriting(reason: "无法投递文字")
-            }
+        // Never use the system clipboard for automatic dictation delivery.
+        if inserter.beginUnicode(text) {
+            scheduleDeliveryPoll()
+        } else {
+            invalidateWriting(reason: "无法直接输入文字，已保留最近结果")
         }
     }
 
-    private func scheduleDeliveryPoll(fallbackText: String?) {
+    private func scheduleDeliveryPoll() {
         deliveryItem?.cancel()
         let work = DispatchWorkItem { [weak self] in
-            self?.pollDelivery(fallbackText: fallbackText)
+            self?.pollDelivery()
         }
         deliveryItem = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.04, execute: work)
     }
 
-    private func pollDelivery(fallbackText: String?) {
+    private func pollDelivery() {
         guard inserter.hasPendingDelivery else { return }
-        let wasUnicode = inserter.pendingChannelIsUnicode
         guard let observation = inserter.pollDelivery() else {
-            scheduleDeliveryPoll(fallbackText: fallbackText)
+            scheduleDeliveryPoll()
             return
         }
         switch observation {
         case .success:
             publish(gate.phase == .idle ? "空闲" : model.statusShort, gate.phase == .idle ? "已输入" : model.statusDetail)
-        case .unchanged, .uncertain:
-            if wasUnicode, let fallbackText, !pasteFallbackTried, !inserter.contains(fallbackText) {
-                pasteFallbackTried = true
-                pendingSynthetic = fallbackText
-                flushSyntheticIfPossible()
-                return
-            }
-            if !inserter.contains(fallbackText ?? "") {
-                invalidateWriting(reason: "写入结果不确定，已停止，可复制最近结果")
-            }
-        case .focusLost, .editedByUser:
-            if !DeliveryRetry.mayPostAgain(observation) {
-                invalidateWriting(reason: "写入结果不确定，已停止，可复制最近结果")
-            }
+        case .unchanged, .uncertain, .focusLost, .editedByUser:
+            // A slow field may have accepted the first event: do not post it again.
+            invalidateWriting(reason: "无法确认直接输入，已停止；剪贴板未改动，可手动复制最近结果")
         }
     }
 
@@ -531,16 +506,6 @@ final class SessionController {
         let action = gate.interrupt()
         if action == .beginFinish || action == .cancelStartAndFinish {
             beginFinish()
-        }
-    }
-
-    private func notePaste(_ restored: Bool, outcome: WriteOutcome) {
-        if outcome == .focusLost {
-            apply(outcome)
-            return
-        }
-        if !restored {
-            publish("已输入", "未能确认粘贴完成，剪贴板未恢复")
         }
     }
 

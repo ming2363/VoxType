@@ -14,7 +14,6 @@ enum InputProbe {
     case live(AXUIElement, pid_t)
     case sentence(AXUIElement, pid_t)
     case unicode(AXUIElement, pid_t)
-    case paste(AXUIElement, pid_t)
     case blocked(String)
 }
 
@@ -51,11 +50,8 @@ final class TextInserter {
         if selectedSettable && textRole {
             return .sentence(element, pid)
         }
-        if textRole && stringAttribute(element, kAXValueAttribute) != nil {
-            return .unicode(element, pid)
-        }
         if textRole || role == "AXWebArea" || selectedSettable {
-            return .paste(element, pid)
+            return .unicode(element, pid)
         }
         return .blocked("当前焦点不是可编辑输入框")
     }
@@ -278,48 +274,7 @@ final class TextInserter {
             text: text,
             before: before,
             insertionIndex: cursor ?? UTF16Text.length(before ?? ""),
-            channel: .unicode,
             confirmer: DeliveryConfirmer()
-        )
-        return true
-    }
-
-    func beginPaste(_ text: String) -> Bool {
-        let text = InsertedText.sanitized(text)
-        guard !text.isEmpty, acceptsTargetApp() || insertionStillAllowed() else { return false }
-        let before = element.flatMap { stringAttribute($0, kAXValueAttribute) }
-        let board = NSPasteboard.general
-        let snapshot = board.pasteboardItems?.map { item -> PasteSnapshot in
-            var values: [NSPasteboard.PasteboardType: Data] = [:]
-            for type in item.types {
-                if let data = item.data(forType: type) {
-                    values[type] = data
-                }
-            }
-            return PasteSnapshot(values: values)
-        } ?? []
-        board.clearContents()
-        board.setString(text, forType: .string)
-        let source = CGEventSource(stateID: .privateState)
-        source?.userData = marker
-        guard let down = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
-              let up = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false) else {
-            return false
-        }
-        down.flags = .maskCommand
-        up.flags = .maskCommand
-        down.setIntegerValueField(.eventSourceUserData, value: marker)
-        up.setIntegerValueField(.eventSourceUserData, value: marker)
-        down.post(tap: .cgAnnotatedSessionEventTap)
-        up.post(tap: .cgAnnotatedSessionEventTap)
-        delivery = PendingDelivery(
-            text: text,
-            before: before,
-            insertionIndex: cursor ?? UTF16Text.length(before ?? ""),
-            channel: .paste,
-            confirmer: DeliveryConfirmer(),
-            pasteboardChangeCount: board.changeCount,
-            pasteboardSnapshot: snapshot
         )
         return true
     }
@@ -340,9 +295,6 @@ final class TextInserter {
         delivery = pending
         guard let observation else { return nil }
         delivery = nil
-        if observation == .success, pending.channel == .paste {
-            restoreClipboard(pending)
-        }
         if observation == .focusLost || observation == .editedByUser {
             guardState.invalidate()
         }
@@ -350,83 +302,6 @@ final class TextInserter {
     }
 
     var hasPendingDelivery: Bool { delivery != nil }
-    var pendingChannelIsUnicode: Bool { delivery?.channel == .unicode }
-
-    private func restoreClipboard(_ pending: PendingDelivery) {
-        let board = NSPasteboard.general
-        let confirmed = true
-        let restored = ClipboardRestore.shouldRestore(
-            pasteConfirmed: confirmed,
-            changeCountAfterWrite: pending.pasteboardChangeCount,
-            currentChangeCount: board.changeCount
-        )
-        guard restored else { return }
-        board.clearContents()
-        for item in pending.pasteboardSnapshot {
-            let pasteItem = NSPasteboardItem()
-            for (type, data) in item.values {
-                pasteItem.setData(data, forType: type)
-            }
-            if !item.values.isEmpty {
-                board.writeObjects([pasteItem])
-            }
-        }
-    }
-
-    func paste(_ text: String) -> (outcome: WriteOutcome, clipboardRestored: Bool) {
-        let text = InsertedText.sanitized(text)
-        guard !text.isEmpty else { return (.applied, true) }
-        guard focusStillValid() else { return (.focusLost, true) }
-        let board = NSPasteboard.general
-        let snapshot = board.pasteboardItems?.map { item -> (types: [NSPasteboard.PasteboardType], values: [NSPasteboard.PasteboardType: Data]) in
-            var values: [NSPasteboard.PasteboardType: Data] = [:]
-            for type in item.types {
-                if let data = item.data(forType: type) {
-                    values[type] = data
-                }
-            }
-            return (item.types, values)
-        } ?? []
-        let beforeCount = board.changeCount
-        board.clearContents()
-        board.setString(text, forType: .string)
-        let afterWrite = board.changeCount
-        let source = CGEventSource(stateID: .privateState)
-        source?.userData = marker
-        guard let down = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
-              let up = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false) else {
-            return (.uncertain, false)
-        }
-        down.flags = .maskCommand
-        up.flags = .maskCommand
-        down.setIntegerValueField(.eventSourceUserData, value: marker)
-        up.setIntegerValueField(.eventSourceUserData, value: marker)
-        down.post(tap: .cgAnnotatedSessionEventTap)
-        up.post(tap: .cgAnnotatedSessionEventTap)
-        let confirmed = confirmPaste(text)
-        let restored = ClipboardRestore.shouldRestore(
-            pasteConfirmed: confirmed,
-            changeCountAfterWrite: afterWrite,
-            currentChangeCount: board.changeCount
-        )
-        if restored {
-            board.clearContents()
-            for item in snapshot {
-                let pasteItem = NSPasteboardItem()
-                for (type, data) in item.values {
-                    pasteItem.setData(data, forType: type)
-                }
-                if !item.values.isEmpty {
-                    board.writeObjects([pasteItem])
-                }
-            }
-            if snapshot.isEmpty && beforeCount == board.changeCount {
-                board.clearContents()
-            }
-        }
-        return (confirmed ? .applied : .uncertain, restored)
-    }
-
     private func firstLiveWrite(_ element: AXUIElement, text: String) -> WriteOutcome {
         let selection = readSelection(element) ?? CFRange(location: 0, length: 0)
         guard setSelectedText(element, text) else {
@@ -443,20 +318,6 @@ final class TextInserter {
         guardState.noteLive(location: owned.location, text: text)
         consumedInitialSelection = true
         return .applied
-    }
-
-    private func confirmPaste(_ text: String) -> Bool {
-        guard let element else { return false }
-        if let value = stringAttribute(element, kAXValueAttribute), value.contains(text) {
-            return true
-        }
-        if let selection = readSelection(element), selection.location >= UTF16Text.length(text) {
-            let start = selection.location - UTF16Text.length(text)
-            if readString(element, range: CFRange(location: start, length: UTF16Text.length(text))) == text {
-                return true
-            }
-        }
-        return false
     }
 
     private func resolvedFocus() -> AXUIElement? {
@@ -670,21 +531,9 @@ final class TextInserter {
     }
 }
 
-private struct PasteSnapshot {
-    var values: [NSPasteboard.PasteboardType: Data]
-}
-
 private struct PendingDelivery {
     var text: String
     var before: String?
     var insertionIndex: Int
-    var channel: DeliveryChannel
     var confirmer: DeliveryConfirmer
-    var pasteboardChangeCount = 0
-    var pasteboardSnapshot: [PasteSnapshot] = []
-}
-
-private enum DeliveryChannel {
-    case unicode
-    case paste
 }

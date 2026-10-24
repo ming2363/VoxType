@@ -161,12 +161,6 @@ public enum SyntheticInputPolicy {
     }
 }
 
-public enum ClipboardRestore {
-    public static func shouldRestore(pasteConfirmed: Bool, changeCountAfterWrite: Int, currentChangeCount: Int) -> Bool {
-        pasteConfirmed && changeCountAfterWrite == currentChangeCount
-    }
-}
-
 public struct HotkeyChord: Codable, Equatable, Sendable {
     public var keyCode: UInt16?
     public var modifiers: UInt64

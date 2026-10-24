@@ -10,6 +10,18 @@ func check(_ condition: Bool, _ message: String) {
 }
 
 func runChecks() throws {
+    for phase in [SessionPhase.starting, .recording, .finishing] {
+        for status in ["空闲", "已停止", "无权限", "确认输入", "连接提示"] {
+            let display = FloatingStatusDisplay(phase: phase, status: status)
+            check(display.status != nil && !display.autoHides, "活动会话不因提示文字变化而隐藏")
+        }
+    }
+    check(FloatingStatusDisplay(phase: .recording, status: "已停止") == .persistent("录音"), "文字写入停止不等于录音停止")
+    check(FloatingStatusDisplay(phase: .idle, status: "空闲") == .hidden, "空闲隐藏")
+    check(FloatingStatusDisplay(phase: .idle, status: "确认输入") == .persistent("确认输入"), "等待投递确认不自动隐藏")
+    check(FloatingStatusDisplay(phase: .idle, status: "等待松开") == .persistent("等待松开"), "等待松开不自动隐藏")
+    check(FloatingStatusDisplay(phase: .idle, status: "无法输入").autoHides, "空闲错误提示允许自动隐藏")
+
     let headers = DoubaoHandshake.headers(apiKey: "secret-value", resourceID: DoubaoEndpoint.resourceDuration, requestID: "req-1")
     check(Set(headers.keys) == ["X-Api-Key", "X-Api-Resource-Id", "X-Api-Request-Id"], "握手头")
     check(headers["X-Api-Sequence"] == nil, "不发送旧版序号头")
@@ -126,9 +138,6 @@ func runChecks() throws {
     check(UTF16Text.length("你好") == 2 && UTF16Text.length("a\nb") == 3 && UTF16Text.length("😀") == 2, "utf16")
     check(UTF16Text.length("😀") != "😀".count, "emoji 不能用字符数")
     check(SyntheticInputPolicy.mustDefer(held: .command) && !SyntheticInputPolicy.mustDefer(held: []), "修饰键推迟模拟输入")
-    check(!ClipboardRestore.shouldRestore(pasteConfirmed: false, changeCountAfterWrite: 2, currentChangeCount: 2), "未确认不恢复剪贴板")
-    check(!ClipboardRestore.shouldRestore(pasteConfirmed: true, changeCountAfterWrite: 2, currentChangeCount: 3), "剪贴板已变不恢复")
-    check(ClipboardRestore.shouldRestore(pasteConfirmed: true, changeCountAfterWrite: 2, currentChangeCount: 2), "确认后才恢复")
     check(InsertedText.sanitized("a\nb") == "a b", "去掉换行避免提交")
 
     check(AudioSendScheduler.decide(phase: .recording, handshakeReady: true, lastPacketSent: false, pendingBytes: 100, conversionPending: false, packetBytes: 6400) == .wait(0.05), "不足一包继续等待")
@@ -217,15 +226,6 @@ func runChecks() throws {
     check(callbacks.handshake("second"), "新握手生效")
     check(!callbacks.timeout("first"), "旧超时不生效")
     check(!callbacks.timeout("second"), "已握手后超时不再生效")
-
-    var channels = SessionDeliveryState()
-    channels.reset(fallbackIsUnicode: true)
-    check(channels.nextChannel() == "unicode", "第一次走 Unicode")
-    channels.reset(fallbackIsUnicode: true)
-    check(channels.nextChannel() == "unicode", "第二次会话重置后仍走 Unicode")
-    channels.reset(fallbackIsUnicode: true)
-    check(channels.nextChannel() == "unicode", "第三次会话重置后仍走 Unicode")
-    check(channels.nextChannel() == "paste", "同一会话第二次才粘贴")
 
     check(FinishStatus.resolve(writeFailed: true, pendingDelivery: false, waitingModifiers: false, incomplete: false, successDetail: "已完成") == nil, "写入失败不被已完成覆盖")
     check(FinishStatus.resolve(writeFailed: false, pendingDelivery: false, waitingModifiers: false, incomplete: true, successDetail: "收尾超时")?.short == "未完成", "收尾超时保留未完成")

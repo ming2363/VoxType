@@ -3,9 +3,10 @@
 </p>
 <h1 align="center">VoxType</h1>
 <p align="center">
-  <strong>Own your Mac dictation: native Swift, your ASR key, speech directly at the cursor.</strong>
+  <strong>Open-source dictation. Zero client subscription. Zero model downloads. Your clipboard stays yours.</strong>
 </p>
-<p align="center">Hold a shortcut. Speak Chinese, English, or both. Keep writing where you already work.</p>
+<p align="center">Hold a shortcut. Speak Chinese, English, or both. Text goes directly into the field you're using.</p>
+<p align="center"><sub>The client is free; bring your Doubao ASR key. Provider usage charges apply.</sub></p>
 <p align="center">
   <img src="https://img.shields.io/badge/macOS-15%2B-111827" alt="macOS 15+">
   <img src="https://img.shields.io/badge/Apple_Silicon-arm64-007AFF" alt="Apple Silicon">
@@ -17,59 +18,32 @@
   <a href="#why-voxtype">Why VoxType</a> · <a href="#how-it-compares">Comparison</a> · <a href="#measured-not-guessed">Measurements</a> · <a href="docs/GETTING_STARTED.md">Get started</a>
 </p>
 
-| First text · ASR P50 | Final tail · ASR P50 | Local app file contents |
-| :---: | :---: | :---: |
-| **0.89 s** | **0.47 s** | **2.21 MiB** |
-
-<sub>30 synthetic sentences × 2, real API calls. Transport timing, not microphone-to-field latency. [Methods and full results](benchmarks/RESULTS.md).</sub>
+![VoxType advantages: Apache-2.0 source, no client subscription, no bundled local models, and no automatic clipboard writes.](docs/images/advantages-en.svg)
 
 ## Why VoxType
 
-VoxType is a focused, open-source dictation utility for people who want to type less on a Mac. It lives in the menu bar and sends microphone audio directly to **Doubao Streaming ASR 2.0** under your own Volcengine account. Text goes into the focused field, so you can keep working in your editor, chat, document, or browser.
+**VoxType is for Mac users who want an inspectable, focused dictation tool without a client subscription or a local model setup.** Its native Swift client sends speech to Doubao Streaming ASR 2.0 under your own account and writes into the focused field. You control the source and service account; there is no VoxType account or relay server.
 
-Its strengths are **a small native client, an inspectable input pipeline, and control over your own ASR connection**. You do not need a VoxType account, a separate backend, or a local model download. The app concentrates on getting your words into the field with ASR sentence-final correction and no additional LLM rewriting call.
+- **Direct input, preserved clipboard.** Accessibility writes or Unicode keyboard events deliver your words. Only an explicit Copy Last Result action changes the clipboard.
+- **Streaming text with sentence-final correction.** Supported fields show live text; finalized ASR results correct the current sentence. Other fields use automatic sentence-final or release-time delivery.
+- **Your words, without an extra rewriting call.** ASR handles transcription, punctuation and sentence-final correction; the client adds no separate LLM rewriting step.
+- **A small native utility.** Menu bar, configurable shortcut, Keychain credentials and login startup. No Electron, helper server or bundled model weights.
 
-| Designed for everyday dictation | What that means |
-| --- | --- |
-| **Speak directly into your workflow** | Hold your chosen shortcut to speak, release to finish. No confirmation step or manual transcript copying. |
-| **Streaming with sentence-final correction** | Safely editable fields show live text; final ASR results correct the current sentence in place. Other fields fall back to automatic sentence-final or release-time insertion. |
-| **A small native implementation** | Swift, AppKit and SwiftUI; no Electron, WebView, helper server or bundled inference model. |
-| **Your service connection** | Bring your own API key. The app connects to the ASR provider without a VoxType relay; provider usage charges still apply. |
-| **Chinese and English in one workflow** | Chinese, English and mixed-language dictation through the current ASR integration. |
-| **Careful text delivery** | Guards against focus/caret changes and manual edits. Password fields are excluded; text is never automatically sent or executed with Enter. |
-| **A native Mac utility** | Menu-bar controls, configurable shortcut, Keychain credentials, permission settings, login startup, and a nonactivating recording/status indicator. |
-
-Streaming insertion depends on the target application's accessibility support. Compatibility is a goal, not a promise that every text field is supported.
+Field compatibility depends on the target application's accessibility support. If direct delivery cannot be confirmed, the app stops rather than retrying with clipboard paste.
 
 ## How it compares
 
-VoxType's distinction is its **open, focused, native implementation with a direct BYOK ASR connection**. Choose it when that control matters more than broad writing-assistant features.
+![Product approach comparison: VoxType emphasizes editable source, direct BYOK recognition and clipboard-free input; Wispr Flow emphasizes writing polish; Superwhisper emphasizes offline and model options; Apple Dictation is built in.](docs/images/comparison-en.svg)
 
-| Product | Main emphasis | Where VoxType differs |
-| --- | --- | --- |
-| **VoxType** | Open-source Mac dictation; direct Doubao ASR; live/final text delivery | Inspect and modify the client, use your own ASR account, and avoid a separate rewriting stage. |
-| **[Apple Dictation](https://support.apple.com/guide/mac-help/use-dictation-mh40584/mac)** | Built-in dictation, configurable shortcut and supported-language punctuation | VoxType provides a modifiable client and an explicit Doubao ASR connection. Apple Dictation needs no separate app installation. |
-| **[Wispr Flow](https://wisprflow.ai/)** | Cross-platform dictation with polished writing, vocabulary and formatting features | VoxType focuses on ASR text delivery with no extra LLM rewriting call. Flow advertises 100+ languages; VoxType currently focuses on Chinese and English. |
-| **[Superwhisper](https://superwhisper.com/)** | Offline recognition, custom modes and selectable models | VoxType ships without local models and has a narrower configuration surface. Superwhisper offers offline use and advertises 100+ languages and dialects. |
-
-Descriptions were checked against the linked official pages on **2026-10-24**. This is a positioning comparison, not a head-to-head speed or accuracy benchmark. **VoxType currently needs the network; offline recognition is an advantage of alternatives that support it.**
+<sub>Official product capabilities checked 2026-10-24. This is a capability map, not a network-call diagram or measured performance ranking. Both commercial alternatives offer free tiers. [Sources and scope](docs/images/README.md).</sub>
 
 ## Measured, not guessed
 
-Original Chinese, English and mixed-language sentences, a reproducible runner, and raw per-request results are included. The test uses the application's actual ASR client and recognition reducer. See [the benchmark](benchmarks/README.md) for exact methods and limitations.
+![VoxType measured ASR latency: first text P50 891 ms and P95 1292 ms; final tail P50 471 ms and P95 698 ms. Chinese CER 0.58%, English WER 0%, mixed MER 5.17%; 60 successful requests.](docs/images/benchmark-en.svg)
 
-<!-- BENCHMARK_SUMMARY_EN -->
-| Controlled ASR measurement | Result |
-| --- | ---: |
-| **First text received, P50 / P95** | **891 / 1,292 ms** |
-| **Final response tail, P50 / P95** | **471 / 698 ms** |
-| Successful requests | 60 / 60 |
-| Chinese CER / English WER / mixed MER | 0.58% / 0.00% / 5.17% |
+The 2026-10-24 evaluation used **30 synthetic sentences × 2 repetitions**, with real Doubao calls. Timings cover ASR transport and result reduction, excluding microphone startup and visible field insertion. No competitor was timed in this run. [Raw results and limits](benchmarks/RESULTS.md) · [Reproduce the test](benchmarks/README.md).
 
-30 original sentences × 2; macOS synthetic voices; real Doubao calls on 2026-10-24. **These are ASR transport/reducer results, not microphone-to-field latency, human-speech accuracy, or a competitor comparison.** Connection setup is measured separately. [Raw results and limitations](benchmarks/RESULTS.md).
-<!-- /BENCHMARK_SUMMARY_EN -->
-
-The inspected local `.app` contains **2.21 MiB of file contents**, including its icon and signature; the executable is **754 KiB**. The Swift package declares **0 remote package dependencies**. These are local artifact/source measurements, not comparative CPU or memory claims. See [measurement details](benchmarks/RESULTS.md).
+The measured baseline app contained **2.21 MiB** of file contents, including its icon and signature, with a **754 KiB** executable. These are snapshot measurements; build sizes can change. `Package.swift` declares **0 remote package dependencies**.
 
 ## A short path to speaking
 
@@ -87,7 +61,7 @@ The repository currently documents a **local build**, not a notarized public ins
 - Your key is stored in **macOS Keychain**, not a project configuration file.
 - Audio is sent to **Volcengine/ByteDance's ASR endpoint** while dictating. This is cloud recognition; provider terms and retention policies apply.
 - No recording archive or transcript-history database is implemented. The latest result remains in memory for an explicit “copy last result” action.
-- Accessibility APIs inspect the focused field to deliver and verify text. A fallback may temporarily use the clipboard. The recording indicator can display recognized text on screen.
+- Accessibility APIs inspect the focused field to deliver and verify text. Fallback uses direct Unicode keyboard events, never clipboard paste. Only the explicit “copy last result” action changes the clipboard. The recording indicator can display recognized text on screen.
 - The idle code path does not start microphone capture or an ASR session. No separate analytics integration exists in the inspected source.
 
 Read [the data-flow and permission notes](docs/PRIVACY.md). Real microphone conditions, accents, Bluetooth devices and application compatibility need broader testing than a controlled ASR sample set.
